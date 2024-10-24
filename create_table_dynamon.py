@@ -3,12 +3,18 @@ from botocore.exceptions import ClientError
 
 def create_tables_if_not_exist(dynamodb):
     existing_table_names = dynamodb.meta.client.list_tables()['TableNames']
+    
     if 'Books' not in existing_table_names:
         create_books_table(dynamodb)
+
     if 'Categories' not in existing_table_names:
         create_categories_table(dynamodb)
+        
     if 'Transactions' not in existing_table_names:
         create_transactions_table(dynamodb)
+
+    if 'Customers' not in existing_table_names:
+        create_customers_table(dynamodb)
 
 def create_books_table(dynamodb):
     try:
@@ -35,7 +41,7 @@ def create_categories_table(dynamodb):
         print("Categories table created successfully.")
     except ClientError as e:
         print(f"Error creating Categories table: {e}")
-        
+
 def create_transactions_table(dynamodb):
     try:
         table = dynamodb.create_table(
@@ -48,6 +54,19 @@ def create_transactions_table(dynamodb):
         print("Transactions table created successfully.")
     except ClientError as e:
         print(f"Error creating Transactions table: {e}")
+
+def create_customers_table(dynamodb):
+    try:
+        table = dynamodb.create_table(
+            TableName='Customers',
+            KeySchema=[{'AttributeName': 'id', 'KeyType': 'HASH'}],
+            AttributeDefinitions=[{'AttributeName': 'id', 'AttributeType': 'S'}],
+            ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
+        )
+        table.wait_until_exists()
+        print("Customers table created successfully.")
+    except ClientError as e:
+        print(f"Error creating Customers table: {e}")
 
 # Penggunaan fungsi
 if __name__ == "__main__":
