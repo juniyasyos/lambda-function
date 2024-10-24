@@ -17,7 +17,10 @@ tables = {
 def lambda_handler(event, context):
     route_key = event.get('routeKey', '')
     path_params = event.get('pathParameters', {})
-    body = json.loads(event.get('body', '{}')) if 'body' in event else {}
+    if 'body' in event and event['body']:
+        body = json.loads(event['body'])
+    else:
+        body = {}
 
     table_key = 'books' if 'books' in route_key else 'categories'
     table = tables[table_key]
