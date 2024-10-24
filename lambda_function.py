@@ -7,7 +7,7 @@ from botocore.exceptions import ClientError
 dynamodb = boto3.resource('dynamodb')
 client = boto3.client('dynamodb')
 
-create_tables_if_not_exist(dynamo
+create_tables_if_not_exist(dynamodb)
 
 routes = ["books", "categories", "authors", "transactions", "customers", "orders"]  
 
