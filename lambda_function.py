@@ -9,38 +9,47 @@ client = boto3.client('dynamodb')
 
 create_tables_if_not_exist(dynamodb)
 
+routes = ["books", "categories", "authors", "transactions"]
+
 tables = {
     'books': dynamodb.Table('Books'),
-    'categories': dynamodb.Table('Categories')
+    'categories': dynamodb.Table('Categories'),
+    'authors': dynamodb.Table('Authors'),  
+    'transactions': dynamodb.Table('Transactions') 
 }
 
 def lambda_handler(event, context):
     route_key = event.get('routeKey', '')
     path_params = event.get('pathParameters', {})
-    if 'body' in event and event['body']:
-        body = json.loads(event['body'])
-    else:
-        body = {}
+    
+    body = json.loads(event.get('body', '{}')) if event.get('body') else {}
 
-    table_key = 'books' if 'books' in route_key else 'categories'
+    table_key = next((key for key in routes if key in route_key), None)
+    if not table_key:
+        return make_response(400, "Invalid route")
+
     table = tables[table_key]
 
     try:
+        # Tangani operasi DELETE
         if route_key.startswith("DELETE"):
             item_id = path_params.get('id')
             if not item_id:
                 raise KeyError("Item ID is required for DELETE operation")
             response = delete_item(table, item_id)
 
+        # Tangani operasi GET berdasarkan ID
         elif route_key.startswith("GET") and '{id}' in route_key:
             item_id = path_params.get('id')
             if not item_id:
                 raise KeyError("Item ID is required for GET operation")
             response = get_item(table, item_id)
 
+        # Tangani operasi GET semua item
         elif route_key.startswith("GET"):
             response = get_all_items(table)
 
+        # Tangani operasi PUT
         elif route_key.startswith("PUT"):
             if 'id' not in body:
                 raise KeyError("Item ID is required for PUT operation")
@@ -57,7 +66,6 @@ def lambda_handler(event, context):
         return make_response(500, f"ClientError: {e.response['Error']['Message']}")
     except Exception as e:
         return make_response(500, f"Error: {str(e)}")
-
 
 def delete_item(table, item_id):
     try:
