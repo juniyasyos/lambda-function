@@ -19,6 +19,9 @@ def create_tables_if_not_exist(dynamodb):
     if 'Authors' not in existing_table_names:
         create_Authors_table(dynamodb)
 
+    if 'Orders' not in existing_table_names:
+        create_orders_table(dynamodb)
+
 def create_books_table(dynamodb):
     try:
         table = dynamodb.create_table(
@@ -83,6 +86,19 @@ def create_Authors_table(dynamodb):
         print("Authors table created successfully.")
     except ClientError as e:
         print(f"Error creating Authors table: {e}")
+
+def create_orders_table(dynamodb):
+    try:
+        table = dynamodb.create_table(
+            TableName='Orders',
+            KeySchema=[{'AttributeName': 'order_id', 'KeyType': 'HASH'}],  
+            AttributeDefinitions=[{'AttributeName': 'order_id', 'AttributeType': 'S'}], 
+            ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}  
+        )
+        table.wait_until_exists()
+        print("Orders table created successfully.")
+    except ClientError as e:
+        print(f"Error creating Orders table: {e}")
 
 # Penggunaan fungsi
 if __name__ == "__main__":
