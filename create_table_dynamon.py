@@ -22,6 +22,9 @@ def create_tables_if_not_exist(dynamodb):
     if 'Orders' not in existing_table_names:
         create_orders_table(dynamodb)
 
+    if 'Publishers' not in existing_table_names:
+        create_orders_tables(dynamodb)
+
 def create_books_table(dynamodb):
     try:
         table = dynamodb.create_table(
@@ -100,6 +103,19 @@ def create_orders_table(dynamodb):
     except ClientError as e:
         print(f"Error creating Orders table: {e}")
 
+def create_publishers_table(dynamodb):
+    try:
+        table = dynamodb.create_table(
+            TableName='Publishers',
+            KeySchema=[{'AttributeName': 'id', 'KeyType': 'HASH'}],
+            AttributeDefinitions=[{'AttributeName': 'id', 'AttributeType': 'S'}],
+            ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
+        )
+        table.wait_until_exists()
+        print("Publishers table created successfully.")
+    except ClientError as e:
+        print(f"Error creating Publishers table: {e}")
+        
 # Penggunaan fungsi
 if __name__ == "__main__":
     dynamodb = boto3.resource('dynamodb')
