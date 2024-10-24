@@ -9,13 +9,14 @@ client = boto3.client('dynamodb')
 
 create_tables_if_not_exist(dynamodb)
 
-routes = ["books", "categories", "authors", "transactions"]
+routes = ["books", "categories", "authors", "transactions", "customers"]
 
 tables = {
     'books': dynamodb.Table('Books'),
     'categories': dynamodb.Table('Categories'),
     'authors': dynamodb.Table('Authors'),  
-    'transactions': dynamodb.Table('Transactions') 
+    'transactions': dynamodb.Table('Transactions'),
+    'customers': dynamodb.Table('Customers')
 }
 
 def lambda_handler(event, context):
