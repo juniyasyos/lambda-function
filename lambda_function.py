@@ -2,7 +2,6 @@ import json
 import boto3
 from decimal import Decimal
 from create_table_dynamon import create_tables_if_not_exist
-from create_routes import create_api_routes
 from botocore.exceptions import ClientError
 
 dynamodb = boto3.resource('dynamodb')
@@ -11,7 +10,6 @@ client = boto3.client('dynamodb')
 create_tables_if_not_exist(dynamodb)
 
 routes = ["books", "categories", "authors", "transactions", "customers"]
-create_api_routes(api_id="dj7ta37s6j", lambda_function_name="book-store", table_names=routes)
 
 tables = {
     'books': dynamodb.Table('Books'),
